@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+  
+  <!-- 1) Documento principal: cabeceras y tabla 'no done' -->
+  <template id="delivery_document_inherit" inherit_id="stock.report_delivery_document">
+    <!-- 1) Forzar sudo en 'o' para ignorar reglas por Unidad Operativa -->
+    <xpath expr="//t[@t-set='o']" position="replace">
+      <t t-set="o" t-value="o.sudo().with_context(lang=o._get_report_lang())"/>
+    </xpath>
+
+    <!-- 2) (Opcional) Asegurar que las líneas no pasan por filtros ajenos -->
+    <xpath expr="//table[@name='stock_move_table']//t[@t-set='lines']" position="replace">
+      <t t-set="lines" t-value="o.move_ids"/>
+    </xpath>
+
+
+    <!-- Lugar de llegada en el encabezado, a la derecha -->
+    <xpath expr="//div[contains(@class,'report-wrapping-flexbox') and contains(@class,'row')]" position="inside">
+      <div t-if="o.location_dest_id"
+           name="div_destination"
+           class="col-auto col-3 mw-100 mb-2 ml-auto text-right">
+        <strong>Lugar de llegada:</strong>
+        <p class="m-0">
+          <t t-esc="o.location_dest_id.complete_name or o.location_dest_id.display_name"/>
+        </p>
+      </div>
+    </xpath>
+
+    <!-- Sello para comprobar herencia -->
+    <xpath expr="//div[@class='page']" position="inside">
+      <div class="text-muted" style="font-size:12px;margin-bottom:6px;">
+        (Notas: herencia aplicada)
+      </div>
+    </xpath>
+
+    <!-- ==== TABLA NO DONE (move_ids) ==== -->
+    <xpath expr="//table[@name='stock_move_table']/thead/tr" position="inside">
+      <th name="th_sm_notes"><strong>Notas</strong></th>
+    </xpath>
+
+    <xpath expr="//table[@name='stock_move_table']/tbody/tr" position="inside">
+      <td name="td_sm_notes">
+        <t t-esc="move.description_picking or move.name"/>
+      </td>
+    </xpath>
+
+    <!-- ==== TABLA DONE (move_line_ids) - solo CABECERA aquí ==== -->
+    <xpath expr="//table[@name='stock_move_line_table']/thead/tr" position="inside">
+      <th name="th_sml_notes"><strong>Notas</strong></th>
+    </xpath>
+    <!-- OJO: las filas se generan en subplantillas; el <td> lo agregamos abajo -->
+  </template>
+
+  <!-- 2) Subplantilla con series/lotes: añadir <td> al final -->
+  <template id="inherit_has_serial_move_line"
+            inherit_id="stock.stock_report_delivery_has_serial_move_line">
+    <xpath expr="//td[last()]" position="after">
+      <td name="td_sml_notes_serial">
+        <t t-esc="move_line.move_id.description_picking or move_line.move_id.name"/>
+      </td>
+    </xpath>
+  </template>
+
+  <!-- 3) Subplantilla de líneas agregadas: añadir <td> al final
+         *** SIN usar .get() para evitar TypeError ***
+  -->
+  <template id="inherit_aggregated_move_lines"
+            inherit_id="stock.stock_report_delivery_aggregated_move_lines">
+    <xpath expr="//tr/td[last()]" position="after">
+      <td name="td_sml_notes_aggr">
+        <!-- 'line' es un dict en estas agregaciones: usamos indexación segura -->
+        <t t-esc="line['description'] if ('description' in line) else ''"/>
+      </td>
+    </xpath>
+  </template>
+</odoo>
