@@ -26,15 +26,44 @@
       </div>
     </xpath>
 
+    <!-- Dirección de llegada SOLO en traslados internos -->
+    <xpath expr="//div[contains(@class,'report-wrapping-flexbox') and contains(@class,'row')]" position="inside">
+      <t t-if="o.picking_type_code == 'internal'">
+	<div name="div_arrival_address"
+             class="col-auto col-4 mw-100 mb-2 ml-auto text-right">
+	  <strong>Dirección de llegada:</strong>
+	  <!-- 1) Partner del almacén del tipo de picking -->
+	  <div t-if="o.picking_type_id.warehouse_id.partner_id"
+               t-field="o.picking_type_id.warehouse_id.partner_id"
+               t-options="{'widget': 'contact',
+                     'fields': ['address','name','phone'],
+                     'no_marker': True,
+                     'phone_icons': True}"/>
+	  <!-- 2) Si no hay partner de almacén, usamos partner de la compañía -->
+	  <div t-elif="o.company_id.partner_id"
+               t-field="o.company_id.partner_id"
+               t-options="{'widget': 'contact',
+                       'fields': ['address','name','phone'],
+                       'no_marker': True,
+                       'phone_icons': True}"/>
+	  <!-- 3) Último recurso: nombre completo de la ubicación destino -->
+	  <p t-else="" class="m-0">
+            <t t-esc="o.location_dest_id.complete_name or o.location_dest_id.display_name"/>
+	  </p>
+	</div>
+      </t>
+    </xpath>
+
+
     <!-- Sello para comprobar herencia -->
-    <xpath expr="//div[@class='page']" position="inside">
+   <!--  <xpath expr="//div[@class='page']" position="inside">
       <div class="text-muted" style="font-size:12px;margin-bottom:6px;">
         (Notas: herencia aplicada)
       </div>
-    </xpath>
+    </xpath> -->
 
     <!-- ==== TABLA NO DONE (move_ids) ==== -->
-    <xpath expr="//table[@name='stock_move_table']/thead/tr" position="inside">
+    <!--<xpath expr="//table[@name='stock_move_table']/thead/tr" position="inside">
       <th name="th_sm_notes"><strong>Notas</strong></th>
     </xpath>
 
@@ -42,35 +71,35 @@
       <td name="td_sm_notes">
         <t t-esc="move.description_picking or move.name"/>
       </td>
-    </xpath>
+    </xpath> -->
 
     <!-- ==== TABLA DONE (move_line_ids) - solo CABECERA aquí ==== -->
-    <xpath expr="//table[@name='stock_move_line_table']/thead/tr" position="inside">
+    <!-- <xpath expr="//table[@name='stock_move_line_table']/thead/tr" position="inside">
       <th name="th_sml_notes"><strong>Notas</strong></th>
-    </xpath>
+    </xpath>-->
     <!-- OJO: las filas se generan en subplantillas; el <td> lo agregamos abajo -->
   </template>
 
   <!-- 2) Subplantilla con series/lotes: añadir <td> al final -->
-  <template id="inherit_has_serial_move_line"
+  <!-- <template id="inherit_has_serial_move_line"
             inherit_id="stock.stock_report_delivery_has_serial_move_line">
     <xpath expr="//td[last()]" position="after">
       <td name="td_sml_notes_serial">
         <t t-esc="move_line.move_id.description_picking or move_line.move_id.name"/>
       </td>
     </xpath>
-  </template>
+  </template>-->
 
   <!-- 3) Subplantilla de líneas agregadas: añadir <td> al final
          *** SIN usar .get() para evitar TypeError ***
   -->
-  <template id="inherit_aggregated_move_lines"
+  <!-- <template id="inherit_aggregated_move_lines"
             inherit_id="stock.stock_report_delivery_aggregated_move_lines">
     <xpath expr="//tr/td[last()]" position="after">
-      <td name="td_sml_notes_aggr">
+      <td name="td_sml_notes_aggr">-->
         <!-- 'line' es un dict en estas agregaciones: usamos indexación segura -->
-        <t t-esc="line['description'] if ('description' in line) else ''"/>
+        <!-- <t t-esc="line['description'] if ('description' in line) else ''"/>
       </td>
     </xpath>
-  </template>
+	     </template>-->
 </odoo>
