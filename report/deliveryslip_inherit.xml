@@ -15,7 +15,7 @@
 
 
     <!-- Lugar de llegada en el encabezado, a la derecha -->
-    <xpath expr="//div[contains(@class,'report-wrapping-flexbox') and contains(@class,'row')]" position="inside">
+    <!-- <xpath expr="//div[contains(@class,'report-wrapping-flexbox') and contains(@class,'row')]" position="inside">
       <div t-if="o.location_dest_id"
            name="div_destination"
            class="col-auto col-3 mw-100 mb-2 ml-auto text-right">
@@ -24,29 +24,42 @@
           <t t-esc="o.location_dest_id.complete_name or o.location_dest_id.display_name"/>
         </p>
       </div>
-    </xpath>
+    </xpath>-->
 
-    <!-- Dirección de llegada SOLO en traslados internos -->
+    <!-- Dirección de llegada del ALMACÉN DESTINO (solo internos) -->
     <xpath expr="//div[contains(@class,'report-wrapping-flexbox') and contains(@class,'row')]" position="inside">
       <t t-if="o.picking_type_code == 'internal'">
-	<div name="div_arrival_address"
+	<!-- Buscar el warehouse cuyo view_location_id es ancestro de la ubicación destino -->
+	<t t-set="dest_wh"
+	   t-value="o.env['stock.warehouse'].sudo().search([('view_location_id','parent_of', o.location_dest_id.id)], limit=1)"/>
+
+	<div name="div_arrival_address_wh"
              class="col-auto col-4 mw-100 mb-2 ml-auto text-right">
 	  <strong>Dirección de llegada:</strong>
-	  <!-- 1) Partner del almacén del tipo de picking -->
-	  <div t-if="o.picking_type_id.warehouse_id.partner_id"
-               t-field="o.picking_type_id.warehouse_id.partner_id"
+
+	  <!-- 1) Dirección del partner del warehouse destino -->
+	  <div t-if="dest_wh and dest_wh.partner_id"
+               t-field="dest_wh.partner_id"
                t-options="{'widget': 'contact',
                      'fields': ['address','name','phone'],
                      'no_marker': True,
                      'phone_icons': True}"/>
-	  <!-- 2) Si no hay partner de almacén, usamos partner de la compañía -->
+
+	  <!-- 2) Si no encontramos warehouse, caemos al partner del tipo de picking -->
+	  <div t-elif="o.picking_type_id.warehouse_id.partner_id"
+               t-field="o.picking_type_id.warehouse_id.partner_id"
+               t-options="{'widget': 'contact',
+                       'fields': ['address','name','phone'],
+                       'no_marker': True,
+                       'phone_icons': True}"/>
+
+	  <!-- 3) Último recurso: compañía o nombre de la ubicación -->
 	  <div t-elif="o.company_id.partner_id"
                t-field="o.company_id.partner_id"
                t-options="{'widget': 'contact',
                        'fields': ['address','name','phone'],
                        'no_marker': True,
                        'phone_icons': True}"/>
-	  <!-- 3) Último recurso: nombre completo de la ubicación destino -->
 	  <p t-else="" class="m-0">
             <t t-esc="o.location_dest_id.complete_name or o.location_dest_id.display_name"/>
 	  </p>
