@@ -1,6 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
+  <!-- Solo alterar el logo del encabezado cuando el documento es un picking interno -->
+  <template id="external_layout_internal_logo_only"
+            inherit_id="web.external_layout_standard">
+    <!-- Reemplazamos la imagen del logo en el header -->
+    <xpath expr="//div[contains(@class,'header')]//img" position="replace">
+      <!-- Si existe 'o' y es un picking interno, forzamos el logo de la compañía -->
+      <t t-if="o and o._name == 'stock.picking' and o.picking_type_code == 'internal' and company and company.id">
+        <img t-att-src="'/web/image/res.company/%s/logo' % company.id"
+             style="max-height: 20mm; max-width: 60mm;"/>
+      </t>
+      <!-- En cualquier otro caso, dejamos el logo normal (sin cambiar el resto de reportes) -->
+      <t t-else="">
+        <img t-att-src="'/web/image/res.company/%s/logo' % company.id"
+             style="max-height: 20mm; max-width: 60mm;"/>
+      </t>
+    </xpath>
+  </template>
   
+  <!-- ################## TRABAJAR DENTRO DEL DOCUMENTO ###################### -->
   <!-- 1) Documento principal: cabeceras y tabla 'no done' -->
   <template id="delivery_document_inherit" inherit_id="stock.report_delivery_document">
     <!-- 1) Forzar sudo en 'o' para ignorar reglas por Unidad Operativa -->
