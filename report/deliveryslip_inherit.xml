@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
   <!-- Inserta el logo en el ENCABEZADO solo para pickings internos -->
-  <template id="external_layout_internal_logo_only"
+  <!-- <template id="external_layout_internal_logo_only"
             inherit_id="web.external_layout_boxed">
     <!-- Metemos el <img> dentro del header, sin reemplazar nada -->
     <xpath expr="//div[contains(@class,'header')]" position="inside">
@@ -10,7 +10,7 @@
              style="max-height: 20mm; max-width: 60mm;"/>
       </t>
     </xpath>
-  </template>  
+  </template>- -->  
   <!-- ################## TRABAJAR DENTRO DEL DOCUMENTO ###################### -->
   <!-- 1) Documento principal: cabeceras y tabla 'no done' -->
   <template id="delivery_document_inherit" inherit_id="stock.report_delivery_document">
