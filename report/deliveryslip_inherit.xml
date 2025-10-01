@@ -2,7 +2,7 @@
 <odoo>
   <!-- Inserta el logo en el ENCABEZADO solo para pickings internos -->
   <template id="external_layout_internal_logo_only"
-            inherit_id="web.external_layout_standard">
+            inherit_id="web.external_layout_boxed">
     <!-- Metemos el <img> dentro del header, sin reemplazar nada -->
     <xpath expr="//div[contains(@class,'header')]" position="inside">
       <t t-if="docs and docs._name == 'stock.picking' and docs[:1].picking_type_code == 'internal' and company and company.id">
