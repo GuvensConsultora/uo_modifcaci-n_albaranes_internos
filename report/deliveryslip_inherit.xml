@@ -1,5 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
+   <!-- Heredar el layout externo global de reportes -->
+  <template id="external_layout_logo_sudo" inherit_id="web.external_layout_boxed">
+
+    <!-- 1) Forzar que 'company' se compute con sudo -->
+    <xpath expr="//t[@t-set='company']" position="replace">
+      <!-- Toma: res_company (si lo pasó el reporte) o la del objeto o la del usuario, y en todos los casos con sudo -->
+      <t t-set="company" t-value="(res_company or (o and o.company_id) or user.company_id).sudo()"/>
+    </xpath>
+
+    <!-- 2) Reemplazar el <img> del logo para usar data-uri (evita /web/image y ACLs) -->
+    <xpath expr="//img[contains(@t-att-src, '/web/image/res.company') or contains(@t-att-src, '/logo')]" position="replace">
+      <img t-if="company.logo"
+           t-att-src="image_data_uri(company.logo)"
+           style="max-height: 45px;"/>
+    </xpath>
+
   <!-- ################## TRABAJAR DENTRO DEL DOCUMENTO ###################### -->
   <!-- 1) Documento principal: cabeceras y tabla 'no done' -->
   <template id="delivery_document_inherit" inherit_id="stock.report_delivery_document">
