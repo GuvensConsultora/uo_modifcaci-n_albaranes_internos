@@ -15,6 +15,7 @@
            t-att-src="image_data_uri(company.logo)"
            style="max-height: 45px;"/>
     </xpath>
+   </template>
 
   <!-- ################## TRABAJAR DENTRO DEL DOCUMENTO ###################### -->
   <!-- 1) Documento principal: cabeceras y tabla 'no done' -->
